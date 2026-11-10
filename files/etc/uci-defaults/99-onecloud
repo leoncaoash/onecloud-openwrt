@@ -41,4 +41,9 @@ uci -q set dhcp.lan.ra='disabled'
 uci -q set dhcp.lan.ndp='disabled'
 uci -q commit dhcp
 
+# Enable ZeroTier service on boot.
+if [ -x /etc/init.d/zerotier ]; then
+    /etc/init.d/zerotier enable
+fi
+
 exit 0
