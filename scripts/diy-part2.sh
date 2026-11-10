@@ -33,4 +33,4 @@ if [ "${USE_CCACHE}" = "true" ]; then
 	printf 'CONFIG_DEVEL=y\nCONFIG_CCACHE=y\n' >> .config
 fi
 
-echo "diy-part2: LAN=${LAN_IP} ccache=${USE_CCACHE}"
+echo "diy-part2: ccache=${USE_CCACHE}"
