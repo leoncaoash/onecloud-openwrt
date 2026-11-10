@@ -1,15 +1,11 @@
-name: Build OpenWrt OneCloud
+name: Build OpenWrt ZeroTier
 
 on:
   schedule:
     # 02:00 UTC on the 1st of every month
     - cron: "0 2 1 * *"
   workflow_dispatch:
-    inputs:
-      lan_ip:
-        description: "Default LAN IP"
-        required: false
-        default: "10.10.10.1"
+    inputs:      
       use_ccache:
         description: "Use ccache"
         required: false
@@ -23,8 +19,7 @@ env:
   TZ: Etc/UTC
   REPO_URL: https://github.com/openwrt/openwrt
   REPO_BRANCH: openwrt-25.12
-  REPO_SERIES: v25.12
-  LAN_IP: ${{ inputs.lan_ip || '10.10.10.1' }}
+  REPO_SERIES: v25.12  
   USE_CCACHE: ${{ github.event_name != 'workflow_dispatch' && 'true' || (inputs.use_ccache && 'true' || 'false') }}
   AMLIMG_VERSION: v0.3.1
   UBOOT_URL: https://github.com/hzyitc/u-boot-onecloud/releases/download/build-20221028-0940/eMMC.burn.img
@@ -111,7 +106,7 @@ jobs:
         run: |
           cd openwrt
           cp "${GITHUB_WORKSPACE}/config/onecloud.config" .config
-          "${GITHUB_WORKSPACE}/scripts/diy-part2.sh" "${LAN_IP}" "${USE_CCACHE}"
+          "${GITHUB_WORKSPACE}/scripts/diy-part2.sh" "${USE_CCACHE}"
           ./scripts/feeds install -a
           make defconfig
 
@@ -200,17 +195,17 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
-          name: OneCloud OpenWrt ${{ env.RELEASE_TAG }}
+          name: OneCloud ZeroTier ${{ env.RELEASE_TAG }}
           files: /tmp/fw/*
           make_latest: false
           body: |
-            OpenWrt `${{ env.OPENWRT_VERSION }}` (`${{ env.OPENWRT_SHA }}`) for Thunder OneCloud (Amlogic S805).
+            OpenWrt `${{ env.OPENWRT_VERSION }}` (`${{ env.OPENWRT_SHA }}`) for Thunder OneCloud (Amlogic S805). Dedicated ZeroTier remote access gateway.
 
             | | |
             | --- | --- |
-            | LAN | `${{ env.LAN_IP }}` |
+            | LAN | `DHCP (automatically assigned by main router)` |
             | login | `root` / `password` |
-            | timezone | `Asia/Tokyo` |
+            | timezone | `Asia/Shanghai` |
 
             **First flash / recovery** — `*-emmc.burn.img.xz`, unpack and write with the Amlogic USB Burning Tool.
 
