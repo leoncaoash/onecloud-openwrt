@@ -1,15 +1,11 @@
 #!/bin/bash
 # Runs inside the OpenWrt tree after `feeds install`.
-# Usage: diy-part2.sh [LAN_IP] [use_ccache]
+# Usage: diy-part2.sh [use_ccache]
 set -euo pipefail
 
-LAN_IP="${1:-10.10.10.1}"
-USE_CCACHE="${2:-true}"
+USE_CCACHE="${1:-true}"
 
 CFG=package/base-files/files/bin/config_generate
-
-# LAN address
-sed -i "s/192\.168\.1\.1/${LAN_IP}/g" "$CFG"
 
 # Hostname. Timezone (Asia/Tokyo) is set in files/etc/uci-defaults/99-onecloud:
 # 25.12's config_generate uses timezone='GMT0', so sed on timezone='UTC' misses.
