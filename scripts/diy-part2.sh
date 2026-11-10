@@ -8,10 +8,6 @@ USE_CCACHE="${2:-true}"
 
 CFG=package/base-files/files/bin/config_generate
 
-# HomeProxy is not in the official feeds; it lives in its own repo.
-rm -rf package/homeproxy
-git clone --depth=1 https://github.com/immortalwrt/homeproxy.git package/homeproxy
-
 # LAN address
 sed -i "s/192\.168\.1\.1/${LAN_IP}/g" "$CFG"
 
