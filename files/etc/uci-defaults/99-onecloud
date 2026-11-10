@@ -8,8 +8,8 @@ uci -q set system.@system[0].zram_comp_algo='lz4'
 
 # Tokyo. Set here, not by sed on config_generate: OpenWrt 25.12 uses
 # timezone='GMT0' / zonename='UTC', so a 'timezone=UTC' substitution misses.
-uci -q set system.@system[0].timezone='JST-9'
-uci -q set system.@system[0].zonename='Asia/Tokyo'
+uci -q set system.@system[0].timezone='CST-8'
+uci -q set system.@system[0].zonename='Asia/Shanghai'
 
 # Serve time to the LAN as well as sync from upstream.
 uci -q set system.ntp.enable_server='1'
@@ -26,27 +26,19 @@ uci -q commit luci
 
 /etc/init.d/irqbalance enable 2>/dev/null
 
-# The OneCloud has a single 100 Mbit port, so WAN has to come from a USB
-# NIC or a tethered phone. Pre-create it on eth1; if nothing is plugged in
-# the interface simply stays down and the LAN keeps working.
-if ! uci -q get network.wan >/dev/null; then
-	uci -q set network.wan=interface
-	uci -q set network.wan.proto='dhcp'
-	uci -q set network.wan.device='eth1'
-	uci -q set network.wan.metric='10'
-	uci -q set network.wan6=interface
-	uci -q set network.wan6.proto='dhcpv6'
-	uci -q set network.wan6.device='eth1'
-	uci -q set network.wan6.reqaddress='try'
-	uci -q set network.wan6.reqprefix='auto'
-	uci -q set network.wan6.metric='10'
-	uci -q commit network
-fi
+# Use the Ethernet port as a DHCP client.
+# Disable LAN DHCP to avoid interfering with the main router.
+uci -q set network.lan.proto='dhcp'
+uci -q delete network.lan.ipaddr
+uci -q delete network.lan.netmask
+uci -q delete network.lan.gateway
+uci -q delete network.lan.ip6assign
+uci -q commit network
 
-# Flow offloading is deliberately left off. Software offload moves
-# established flows into a flowtable that bypasses the netfilter path,
-# which breaks fwmark-based transparent proxying; hardware offload does
-# not exist for this SoC's stmmac driver. At 100 Mbit there is nothing to
-# gain. The LuCI checkbox still works if you ever want it.
+uci -q set dhcp.lan.ignore='1'
+uci -q set dhcp.lan.dhcpv6='disabled'
+uci -q set dhcp.lan.ra='disabled'
+uci -q set dhcp.lan.ndp='disabled'
+uci -q commit dhcp
 
 exit 0
