@@ -75,7 +75,7 @@ jobs:
           ln -sfn /workdir/openwrt "${GITHUB_WORKSPACE}/openwrt"
           echo "OPENWRT_SHA=$(git -C openwrt rev-parse --short HEAD)" >> "$GITHUB_ENV"
           echo "OPENWRT_VERSION=$tag" >> "$GITHUB_ENV"
-          echo "RELEASE_TAG=v$(date +%Y.%m.%d)" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=zerotier-v$(date +%Y.%m.%d)" >> "$GITHUB_ENV"
 
       - name: Cache ccache and downloads
         uses: actions/cache@v4
@@ -202,7 +202,7 @@ jobs:
           tag_name: ${{ env.RELEASE_TAG }}
           name: OneCloud OpenWrt ${{ env.RELEASE_TAG }}
           files: /tmp/fw/*
-          make_latest: true
+          make_latest: false
           body: |
             OpenWrt `${{ env.OPENWRT_VERSION }}` (`${{ env.OPENWRT_SHA }}`) for Thunder OneCloud (Amlogic S805).
 
@@ -216,11 +216,3 @@ jobs:
 
             **Updating** — `*-sysupgrade.img.gz` through LuCI → System → Backup / Flash Firmware, or `sysupgrade`. Only the boot and root partitions are written; u-boot is left alone.
 
-      - name: Prune old releases
-        uses: dev-drprasad/delete-older-releases@v0.3.4
-        continue-on-error: true
-        with:
-          keep_latest: 6
-          delete_tags: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
